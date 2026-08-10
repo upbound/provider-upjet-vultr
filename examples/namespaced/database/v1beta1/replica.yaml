@@ -1,0 +1,41 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Replica
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/replica
+    upjet.upbound.io/manual-intervention: Read replica creation is rejected with 'Invalid plan selected' on this account for every plan tier and region probed (hobbyist is rejected explicitly; the parent must also have completed a backup, which takes ~40 minutes) — the feature appears to need an account entitlement, so it cannot run in automated tests.
+  labels:
+    testing.upbound.io/example-name: example-dbreplica
+  name: example-dbreplica
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-dbreplica
+    region: ewr
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbreplica
+  writeConnectionSecretToRef:
+    name: example-dbreplica-conn
+
+---
+
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/replica
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-databasechildren.sh
+  labels:
+    testing.upbound.io/example-name: example-dbreplica
+  name: example-dbreplica
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-dbreplica
+    databaseEngine: pg
+    databaseEngineVersion: "15"
+    # Hobbyist plans reject read replicas outright; this matches the
+    # upstream acceptance-test fixture.
+    plan: vultr-dbaas-startup-cc-1-55-2
+    region: ewr

@@ -1,0 +1,38 @@
+apiVersion: database.vultr.upbound.io/v1beta1
+kind: ConnectionPool
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/connectionpool
+  labels:
+    testing.upbound.io/example-name: example-dbpool
+  name: example-dbpool
+spec:
+  forProvider:
+    name: example-pool
+    # defaultdb and vultradmin exist on every PostgreSQL cluster.
+    database: defaultdb
+    username: vultradmin
+    mode: transaction
+    size: 3
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbpool
+
+---
+
+apiVersion: database.vultr.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/connectionpool
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-databasechildren.sh
+  labels:
+    testing.upbound.io/example-name: example-dbpool
+  name: example-dbpool
+spec:
+  forProvider:
+    label: example-dbpool
+    databaseEngine: pg
+    databaseEngineVersion: "17"
+    plan: vultr-dbaas-hobbyist-cc-1-25-1
+    region: ewr

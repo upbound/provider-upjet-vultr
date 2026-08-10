@@ -1,0 +1,37 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/user
+  labels:
+    testing.upbound.io/example-name: example-dbuser
+  name: example-dbuser
+  namespace: upbound-system
+spec:
+  forProvider:
+    username: example-dbuser
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbuser
+  writeConnectionSecretToRef:
+    name: example-dbuser-conn
+
+---
+
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/user
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-databasechildren.sh
+  labels:
+    testing.upbound.io/example-name: example-dbuser
+  name: example-dbuser
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-dbuser
+    databaseEngine: pg
+    databaseEngineVersion: "17"
+    plan: vultr-dbaas-hobbyist-cc-1-25-1
+    region: ewr

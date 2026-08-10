@@ -1,0 +1,33 @@
+apiVersion: storage.vultr.m.upbound.io/v1beta1
+kind: ObjectStorageBucket
+metadata:
+  annotations:
+    meta.upbound.io/example-id: storage/v1beta1/objectstoragebucket
+  labels:
+    testing.upbound.io/example-name: example-osbucket
+  name: example-osbucket
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: uptest-${Rand.RFC1123Subdomain}
+    objectStorageIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-osbucket
+
+---
+
+apiVersion: storage.vultr.m.upbound.io/v1beta1
+kind: ObjectStorage
+metadata:
+  annotations:
+    meta.upbound.io/example-id: storage/v1beta1/objectstoragebucket
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-objectstoragebucket.sh
+  labels:
+    testing.upbound.io/example-name: example-osbucket
+  name: example-osbucket
+  namespace: upbound-system
+spec:
+  forProvider:
+    clusterId: 2
+    tierId: 6
+    label: example object storage for bucket

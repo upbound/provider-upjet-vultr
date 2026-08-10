@@ -1,0 +1,18 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OIDCIssuer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/oidcissuer
+  labels:
+    testing.upbound.io/example-name: example-oidcissuer
+  name: example-oidcissuer
+spec:
+  forProvider:
+    source: external
+    uri: https://uptest-issuer.example.com
+    kid: uptest-key-1
+    kty: RSA
+    "n": plv-6ZFtlJktRJYGYTNCyglJaAErvuazOXsvIGYYpAzvce27i6qXWB3kaap_nxrKTdMG-dpPJo7dNDKqSgBjU5t1uBPHKoEz0l-X_V8sJPZKvLGRzWL4ol3-btXemJ8ItWS_bF-5AFrnrqYi2ARRa5NsURN5xjcrB5BwBu8mZMjKzvqH6kpIl7zy4USJ0_YzuDDruU6fN_qlRBRcHBh7-Cjnt4K2nLy2dy7gBhv9xFg6dy-7D_X2eF30GaH0Q6TD1cKmtyaG2nXKAKw4LCjEOCRg88Knglb2vcp68827-MJRTmLDaEGUbmVoVKyhVQVeQOea4UP4p2Og1JX25VUEnw
+    e: AQAB
+    alg: RS256
+    use: sig

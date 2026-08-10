@@ -1,0 +1,83 @@
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: NATGatewayFirewallRule
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayfirewallrule
+  labels:
+    testing.upbound.io/example-name: example-natgwfwrule
+  name: example-natgwfwrule
+spec:
+  forProvider:
+    protocol: tcp
+    port: "443"
+    # The NAT gateway firewall endpoint requires a non-zero subnet_size
+    # (govultr omits zero values, so 0.0.0.0/0 is rejected as missing).
+    subnet: 192.0.2.0
+    subnetSize: 24
+    notes: example nat gateway firewall rule
+    natGatewayIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwfwrule
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwfwrule
+
+---
+
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: NATGatewayPortForwardingRule
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayfirewallrule
+  labels:
+    testing.upbound.io/example-name: example-natgwfwrule
+  name: example-natgwfwrule
+spec:
+  forProvider:
+    name: example-fwrule-forwarding
+    protocol: tcp
+    externalPort: 443
+    internalIp: 10.3.0.10
+    internalPort: 443
+    enabled: true
+    natGatewayIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwfwrule
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwfwrule
+
+---
+
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: NATGateway
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayfirewallrule
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-natgateway-rules.sh
+  labels:
+    testing.upbound.io/example-name: example-natgwfwrule
+  name: example-natgwfwrule
+spec:
+  forProvider:
+    label: example-nat-gateway-fwrule
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwfwrule
+
+---
+
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayfirewallrule
+  labels:
+    testing.upbound.io/example-name: example-natgwfwrule
+  name: example-natgwfwrule
+spec:
+  forProvider:
+    description: example-natgwfwrule
+    region: ewr
+    v4Subnet: 10.3.0.0
+    v4SubnetMask: 24

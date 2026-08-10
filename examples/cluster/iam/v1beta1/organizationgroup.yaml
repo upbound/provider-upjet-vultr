@@ -1,0 +1,12 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationGroup
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationgroup
+  labels:
+    testing.upbound.io/example-name: example-organizationgroup
+  name: example-organizationgroup
+spec:
+  forProvider:
+    name: uptest-group
+    description: example organization group

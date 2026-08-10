@@ -1,0 +1,31 @@
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: NATGateway
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgateway
+  labels:
+    testing.upbound.io/example-name: example-natgw
+  name: example-natgw
+spec:
+  forProvider:
+    label: example-nat-gateway
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgw
+
+---
+
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgateway
+  labels:
+    testing.upbound.io/example-name: example-natgw
+  name: example-natgw
+spec:
+  forProvider:
+    description: example-natgw
+    region: ewr
+    v4Subnet: 10.2.0.0
+    v4SubnetMask: 24

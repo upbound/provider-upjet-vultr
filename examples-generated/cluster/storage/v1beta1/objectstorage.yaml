@@ -1,0 +1,17 @@
+apiVersion: storage.vultr.upbound.io/v1beta1
+kind: ObjectStorage
+metadata:
+  annotations:
+    meta.upbound.io/example-id: storage/v1beta1/objectstorage
+  labels:
+    testing.upbound.io/example-name: tf
+  name: tf
+spec:
+  forProvider:
+    bucket:
+    - enable_lock: true
+      enable_versioning: true
+      name: my-bucket
+    clusterId: 9
+    label: vultr-object-storage
+    tierId: 4

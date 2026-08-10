@@ -1,0 +1,16 @@
+apiVersion: storage.vultr.m.upbound.io/v1beta1
+kind: ObjectStorage
+metadata:
+  annotations:
+    meta.upbound.io/example-id: storage/v1beta1/objectstorage
+  labels:
+    testing.upbound.io/example-name: example-objectstorage
+  name: example-objectstorage
+  namespace: upbound-system
+spec:
+  forProvider:
+    clusterId: 2
+    tierId: 6
+    label: example object storage
+  writeConnectionSecretToRef:
+    name: example-objectstorage-s3

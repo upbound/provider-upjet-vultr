@@ -1,0 +1,34 @@
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: FirewallRule
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/firewallrule
+  labels:
+    testing.upbound.io/example-name: example-firewallrule
+  name: example-firewallrule
+spec:
+  forProvider:
+    firewallGroupIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-firewallrule
+    ipType: v4
+    protocol: tcp
+    port: "8090"
+    subnet: 0.0.0.0
+    subnetSize: 0
+    notes: example firewall rule
+
+---
+
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: FirewallGroup
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/firewallrule
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-firewallrule.sh
+  labels:
+    testing.upbound.io/example-name: example-firewallrule
+  name: example-firewallrule
+spec:
+  forProvider:
+    description: example firewall rule group

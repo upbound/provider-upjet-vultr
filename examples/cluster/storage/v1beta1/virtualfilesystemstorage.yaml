@@ -1,0 +1,15 @@
+apiVersion: storage.vultr.upbound.io/v1beta1
+kind: VirtualFileSystemStorage
+metadata:
+  annotations:
+    meta.upbound.io/example-id: storage/v1beta1/virtualfilesystemstorage
+  labels:
+    testing.upbound.io/example-name: example-vfs
+  name: example-vfs
+spec:
+  forProvider:
+    label: example-vfs-storage
+    region: ewr
+    sizeGb: 10
+    tags:
+      - uptest

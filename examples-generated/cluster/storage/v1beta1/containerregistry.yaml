@@ -1,0 +1,14 @@
+apiVersion: storage.vultr.upbound.io/v1beta1
+kind: ContainerRegistry
+metadata:
+  annotations:
+    meta.upbound.io/example-id: storage/v1beta1/containerregistry
+  labels:
+    testing.upbound.io/example-name: vcr1
+  name: vcr1
+spec:
+  forProvider:
+    name: examplecontainerregistry
+    plan: start_up
+    public: false
+    region: sjc

@@ -1,0 +1,32 @@
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OIDCToken
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/oidctoken
+    upjet.upbound.io/manual-intervention: Exchanging a token requires real client credentials from an external OIDC identity provider, which automated tests do not have.
+  labels:
+    testing.upbound.io/example-name: example-oidctoken
+  name: example-oidctoken
+  namespace: upbound-system
+spec:
+  forProvider:
+    clientId: example-client-id
+    grantType: authorization_code
+    code: example-authorization-code
+    redirectUri: https://example.com/callback
+    clientSecretSecretRef:
+      name: example-oidctoken-client-secret
+      key: clientSecret
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-oidctoken-client-secret
+  namespace: upbound-system
+  labels:
+    testing.upbound.io/example-name: example-oidctoken
+type: Opaque
+stringData:
+  clientSecret: example-client-secret

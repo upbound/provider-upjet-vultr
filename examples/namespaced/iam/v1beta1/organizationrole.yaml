@@ -1,0 +1,15 @@
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OrganizationRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrole
+  labels:
+    testing.upbound.io/example-name: example-organizationrole
+  name: example-organizationrole
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: uptest-role
+    description: example organization role
+    maxSessionDuration: 3600
+    type: assignable

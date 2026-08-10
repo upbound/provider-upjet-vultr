@@ -1,0 +1,12 @@
+apiVersion: compute.vultr.m.upbound.io/v1beta1
+kind: Inference
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/inference
+  labels:
+    testing.upbound.io/example-name: my_inference_subscription
+  name: my-inference-subscription
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: my_inference_label

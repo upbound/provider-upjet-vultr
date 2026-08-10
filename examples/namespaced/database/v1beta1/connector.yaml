@@ -1,0 +1,17 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Connector
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/connector
+    upjet.upbound.io/manual-intervention: Requires a Kafka cluster with Kafka Connect enabled and an external sink/source system for the connector class, which cannot be provisioned self-contained in automated tests.
+  labels:
+    testing.upbound.io/example-name: example-dbconnector
+  name: example-dbconnector
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-connector
+    class: com.couchbase.connect.kafka.CouchbaseSinkConnector
+    topics: example-topic
+    config: '{"couchbase.seed.nodes": "192.0.2.10", "couchbase.username": "example", "couchbase.password": "example"}'
+    databaseId: 00000000-0000-0000-0000-000000000000

@@ -1,0 +1,13 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: Organization
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organization
+    upjet.upbound.io/manual-intervention: The Vultr account is already linked to an organization and the API allows only one, so this example cannot be created in automated tests.
+  labels:
+    testing.upbound.io/example-name: example-organization
+  name: example-organization
+spec:
+  forProvider:
+    name: uptest-org
+    type: Personal/Team

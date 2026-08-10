@@ -1,0 +1,12 @@
+apiVersion: network.vultr.m.upbound.io/v1beta1
+kind: DNSDomain
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/dnsdomain
+    crossplane.io/external-name: uptest-example-domain.com
+  labels:
+    testing.upbound.io/example-name: example-domain
+  name: example-domain
+  namespace: upbound-system
+spec:
+  forProvider: {}

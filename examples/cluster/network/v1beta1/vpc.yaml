@@ -1,0 +1,14 @@
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/vpc
+  labels:
+    testing.upbound.io/example-name: example-vpc
+  name: example-vpc
+spec:
+  forProvider:
+    description: example vpc
+    region: ewr
+    v4Subnet: 10.0.0.0
+    v4SubnetMask: 24

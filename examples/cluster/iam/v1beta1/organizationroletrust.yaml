@@ -1,0 +1,72 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRoleTrust
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationroletrust
+  labels:
+    testing.upbound.io/example-name: example-organizationroletrust
+  name: example-organizationroletrust
+spec:
+  forProvider:
+    type: TemporaryAssumption
+    dateExpires: "2030-01-01T05:00:00+00:00"
+    roleSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationroletrust
+    userSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationroletrust
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationroletrust
+  labels:
+    testing.upbound.io/example-name: example-organizationroletrust
+  name: example-organizationroletrust
+spec:
+  forProvider:
+    name: uptest-rt-role
+    description: example role for trust
+    maxSessionDuration: 3600
+    type: assumable
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationroletrust
+  labels:
+    testing.upbound.io/example-name: example-organizationroletrust
+  name: example-organizationroletrust
+spec:
+  forProvider:
+    name: uptest-rt-user
+    email: ${Rand.RFC1123Subdomain}@example.com
+    passwordSecretRef:
+      name: example-organizationroletrust-user-password
+      namespace: upbound-system
+      key: password
+  initProvider:
+    passwordSecretRef:
+      name: example-organizationroletrust-user-password
+      namespace: upbound-system
+      key: password
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-organizationroletrust-user-password
+  namespace: upbound-system
+  labels:
+    testing.upbound.io/example-name: example-organizationroletrust
+type: Opaque
+stringData:
+  password: SuperSecure-Passw0rd!26

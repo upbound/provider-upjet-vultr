@@ -1,0 +1,49 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRoleGroupAttachment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolegroupattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationrolegroupattachment
+  name: example-organizationrolegroupattachment
+spec:
+  forProvider:
+    roleIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationrolegroupattachment
+    groupIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationrolegroupattachment
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolegroupattachment
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-organizationrolegroupattachment.sh
+  labels:
+    testing.upbound.io/example-name: example-organizationrolegroupattachment
+  name: example-organizationrolegroupattachment
+spec:
+  forProvider:
+    name: uptest-rga-role
+    description: example role for group attachment
+    maxSessionDuration: 3600
+    type: assignable
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationGroup
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolegroupattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationrolegroupattachment
+  name: example-organizationrolegroupattachment
+spec:
+  forProvider:
+    name: uptest-rga-group
+    description: example group for role attachment
