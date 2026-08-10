@@ -1,0 +1,34 @@
+apiVersion: vke.vultr.m.upbound.io/v1beta1
+kind: KubernetesNodePool
+metadata:
+  annotations:
+    meta.upbound.io/example-id: vke/v1beta1/kubernetesnodepool
+  labels:
+    testing.upbound.io/example-name: np-1
+  name: np-1
+  namespace: upbound-system
+spec:
+  forProvider:
+    autoScaler: true
+    clusterIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: k8
+    label: my-label
+    labels:
+    - key: my-label
+      value: a-label-on-all-nodes
+    - key: my-second-label
+      value: another-label-on-all-nodes
+    maxNodes: 2
+    minNodes: 1
+    nodeQuantity: 1
+    plan: vc2-4c-8gb
+    tag: my-tag
+    taints:
+    - effect: NoExecute
+      key: a-taint
+      value: is-tainted
+    - effect: NoSchedule
+      key: another-taint
+      value: is-tainted
+    userData: ${base64encode("This will be added to node user data")}
