@@ -5,7 +5,10 @@
 package iam
 
 import (
+	"time"
+
 	"github.com/crossplane/upjet/v2/pkg/config"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 // Configure configures the iam group
@@ -56,5 +59,18 @@ func Configure(p *config.Provider) {
 		r.References["role"] = config.Reference{TerraformName: "vultr_organization_role"}
 		r.References["group"] = config.Reference{TerraformName: "vultr_organization_group"}
 		r.References["user"] = config.Reference{TerraformName: "vultr_user"}
+		// The API rewrites the time-of-day of date_expires depending on
+		// the caller, so only the calendar date round-trips stably;
+		// comparing the full timestamp leaves a permanent diff
+		r.TerraformResource.Schema["date_expires"].DiffSuppressFunc = func(_, old, new string, _ *schema.ResourceData) bool {
+			oldT, oldErr := time.Parse(time.RFC3339, old)
+			newT, newErr := time.Parse(time.RFC3339, new)
+			if oldErr != nil || newErr != nil {
+				return false
+			}
+			oy, om, od := oldT.Date()
+			ny, nm, nd := newT.Date()
+			return oy == ny && om == nm && od == nd
+		}
 	})
 }
