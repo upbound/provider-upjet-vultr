@@ -1,0 +1,14 @@
+apiVersion: network.vultr.m.upbound.io/v1beta1
+kind: ReservedIP
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/reservedip
+  labels:
+    testing.upbound.io/example-name: example-reserved-ip
+  name: example-reserved-ip
+  namespace: upbound-system
+spec:
+  forProvider:
+    region: ewr
+    ipType: v4
+    label: example-reserved-ip

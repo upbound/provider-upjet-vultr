@@ -1,0 +1,57 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRolePolicyAttachment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolepolicyattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationrolepolicyattachment
+  name: example-organizationrolepolicyattachment
+spec:
+  forProvider:
+    roleIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationrolepolicyattachment
+    policyIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationrolepolicyattachment
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRole
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolepolicyattachment
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-organizationrolepolicyattachment.sh
+  labels:
+    testing.upbound.io/example-name: example-organizationrolepolicyattachment
+  name: example-organizationrolepolicyattachment
+spec:
+  forProvider:
+    name: uptest-rpa-role
+    description: example role for policy attachment
+    maxSessionDuration: 3600
+    type: assignable
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolepolicyattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationrolepolicyattachment
+  name: example-organizationrolepolicyattachment
+spec:
+  forProvider:
+    name: uptest-rpa-policy
+    description: example policy for role attachment
+    document:
+      version: "2012-10-17"
+      statement:
+        - actions:
+            - network.dns.*
+          effect: Allow
+          resources:
+            - "*"

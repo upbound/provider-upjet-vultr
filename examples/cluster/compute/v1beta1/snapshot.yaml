@@ -1,0 +1,31 @@
+apiVersion: compute.vultr.upbound.io/v1beta1
+kind: Snapshot
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/snapshot
+  labels:
+    testing.upbound.io/example-name: example-snapshot
+  name: example-snapshot
+spec:
+  forProvider:
+    description: example snapshot
+    instanceIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-snapshot
+
+---
+
+apiVersion: compute.vultr.upbound.io/v1beta1
+kind: Instance
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/snapshot
+  labels:
+    testing.upbound.io/example-name: example-snapshot
+  name: example-snapshot
+spec:
+  forProvider:
+    label: example-snapshot
+    region: ewr
+    plan: vc2-1c-1gb
+    osId: 2136

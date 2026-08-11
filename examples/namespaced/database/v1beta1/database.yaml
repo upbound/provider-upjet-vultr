@@ -1,0 +1,18 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/database
+  labels:
+    testing.upbound.io/example-name: example-database
+  name: example-database
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-database
+    databaseEngine: pg
+    databaseEngineVersion: "17"
+    plan: vultr-dbaas-hobbyist-cc-1-25-1
+    region: ewr
+  writeConnectionSecretToRef:
+    name: example-database-conn

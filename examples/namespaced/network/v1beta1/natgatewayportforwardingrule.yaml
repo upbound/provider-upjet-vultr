@@ -1,0 +1,61 @@
+apiVersion: network.vultr.m.upbound.io/v1beta1
+kind: NATGatewayPortForwardingRule
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayportforwardingrule
+  labels:
+    testing.upbound.io/example-name: example-natgwpfrule
+  name: example-natgwpfrule
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-port-forwarding-rule
+    description: example nat gateway port forwarding rule
+    protocol: tcp
+    externalPort: 8080
+    internalIp: 10.4.0.10
+    internalPort: 80
+    enabled: true
+    natGatewayIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwpfrule
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwpfrule
+
+---
+
+apiVersion: network.vultr.m.upbound.io/v1beta1
+kind: NATGateway
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayportforwardingrule
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-natgateway-rules.sh
+  labels:
+    testing.upbound.io/example-name: example-natgwpfrule
+  name: example-natgwpfrule
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-nat-gateway-pfrule
+    vpcIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-natgwpfrule
+
+---
+
+apiVersion: network.vultr.m.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/natgatewayportforwardingrule
+  labels:
+    testing.upbound.io/example-name: example-natgwpfrule
+  name: example-natgwpfrule
+  namespace: upbound-system
+spec:
+  forProvider:
+    description: example-natgwpfrule
+    region: ewr
+    v4Subnet: 10.4.0.0
+    v4SubnetMask: 24

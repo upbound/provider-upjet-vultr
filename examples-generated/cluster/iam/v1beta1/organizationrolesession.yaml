@@ -1,0 +1,15 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationRoleSession
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationrolesession
+  labels:
+    testing.upbound.io/example-name: sss
+  name: sss
+spec:
+  forProvider:
+    duration: 2300
+    ipAddress: 10.0.0.1
+    role: 2c536798-6472-4907-b901-8b0c50c9789f
+    sessionName: my-terraform-session
+    user: 4f86871e-fa75-4fb8-8960-fe4bac4e498c

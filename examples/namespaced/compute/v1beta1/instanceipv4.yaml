@@ -1,0 +1,34 @@
+apiVersion: compute.vultr.m.upbound.io/v1beta1
+kind: InstanceIPv4
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/instanceipv4
+  labels:
+    testing.upbound.io/example-name: example-instanceipv4
+  name: example-instanceipv4
+  namespace: upbound-system
+spec:
+  forProvider:
+    instanceIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-instanceipv4
+    reboot: false
+
+---
+
+apiVersion: compute.vultr.m.upbound.io/v1beta1
+kind: Instance
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/instanceipv4
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-instanceipv4.sh
+  labels:
+    testing.upbound.io/example-name: example-instanceipv4
+  name: example-instanceipv4
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-instanceipv4
+    region: ewr
+    plan: vc2-1c-1gb
+    osId: 2136

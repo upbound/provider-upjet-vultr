@@ -1,0 +1,33 @@
+apiVersion: database.vultr.upbound.io/v1beta1
+kind: DB
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/db
+  labels:
+    testing.upbound.io/example-name: example-db
+  name: example-db
+spec:
+  forProvider:
+    name: exampledb
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-db
+
+---
+
+apiVersion: database.vultr.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/db
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-databasechildren.sh
+  labels:
+    testing.upbound.io/example-name: example-db
+  name: example-db
+spec:
+  forProvider:
+    label: example-db
+    databaseEngine: pg
+    databaseEngineVersion: "17"
+    plan: vultr-dbaas-hobbyist-cc-1-25-1
+    region: ewr

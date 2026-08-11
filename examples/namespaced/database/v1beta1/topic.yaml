@@ -1,0 +1,39 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Topic
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/topic
+  labels:
+    testing.upbound.io/example-name: example-dbtopic
+  name: example-dbtopic
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-topic
+    partitions: 3
+    replication: 2
+    retentionHours: 24
+    retentionBytes: 1073741824
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbtopic
+
+---
+
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/topic
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-databasechildren.sh
+  labels:
+    testing.upbound.io/example-name: example-dbtopic
+  name: example-dbtopic
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-dbtopic
+    databaseEngine: kafka
+    databaseEngineVersion: "4.2"
+    plan: vultr-dbaas-business-3x-occ-so-2-200-4
+    region: ewr

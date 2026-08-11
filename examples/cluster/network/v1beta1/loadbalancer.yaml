@@ -1,0 +1,46 @@
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: LoadBalancer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/loadbalancer
+  labels:
+    testing.upbound.io/example-name: example-lb
+  name: example-lb
+spec:
+  forProvider:
+    region: ewr
+    label: example load balancer
+    balancingAlgorithm: roundrobin
+    forwardingRules:
+      - frontendProtocol: http
+        frontendPort: 80
+        backendProtocol: http
+        backendPort: 80
+    healthCheck:
+      protocol: http
+      port: 80
+      path: /
+      checkInterval: 15
+      responseTimeout: 5
+      unhealthyThreshold: 5
+      healthyThreshold: 5
+    vpcSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-lb
+
+---
+
+apiVersion: network.vultr.upbound.io/v1beta1
+kind: VPC
+metadata:
+  annotations:
+    meta.upbound.io/example-id: network/v1beta1/loadbalancer
+  labels:
+    testing.upbound.io/example-name: example-lb
+  name: example-lb
+spec:
+  forProvider:
+    description: example-lb
+    region: ewr
+    v4Subnet: 10.1.0.0
+    v4SubnetMask: 24

@@ -1,0 +1,14 @@
+apiVersion: database.vultr.upbound.io/v1beta1
+kind: DB
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/db
+  labels:
+    testing.upbound.io/example-name: my_database_db
+  name: my-database-db
+spec:
+  forProvider:
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: my_database
+    name: my_database_db

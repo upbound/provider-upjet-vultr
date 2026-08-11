@@ -1,0 +1,61 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Quota
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/quota
+  labels:
+    testing.upbound.io/example-name: example-dbquota
+  name: example-dbquota
+  namespace: upbound-system
+spec:
+  forProvider:
+    clientId: example-client
+    consumerByteRate: 1048576
+    producerByteRate: 1048576
+    requestPercentage: 50
+    userSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbquota
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbquota
+
+---
+
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/quota
+  labels:
+    testing.upbound.io/example-name: example-dbquota
+  name: example-dbquota
+  namespace: upbound-system
+spec:
+  forProvider:
+    username: example-quota-user
+    # Kafka clusters require an explicit permission (421 otherwise).
+    permission: admin
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-dbquota
+
+---
+
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: Database
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/quota
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-databasechildren.sh
+  labels:
+    testing.upbound.io/example-name: example-dbquota
+  name: example-dbquota
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-dbquota
+    databaseEngine: kafka
+    databaseEngineVersion: "4.2"
+    plan: vultr-dbaas-business-3x-occ-so-2-200-4
+    region: ewr

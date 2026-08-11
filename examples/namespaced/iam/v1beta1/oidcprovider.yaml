@@ -1,0 +1,12 @@
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OIDCProvider
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/oidcprovider
+  labels:
+    testing.upbound.io/example-name: example-oidcprovider
+  name: example-oidcprovider
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: uptest-oidc-provider

@@ -1,0 +1,77 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationPolicyUserAttachment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationpolicyuserattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicyuserattachment
+  name: example-organizationpolicyuserattachment
+spec:
+  forProvider:
+    policyIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationpolicyuserattachment
+    userIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationpolicyuserattachment
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationpolicyuserattachment
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-organizationpolicyuserattachment.sh
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicyuserattachment
+  name: example-organizationpolicyuserattachment
+spec:
+  forProvider:
+    name: uptest-pua-policy
+    description: example policy for user attachment
+    document:
+      version: "2012-10-17"
+      statement:
+        - actions:
+            - network.dns.*
+          effect: Allow
+          resources:
+            - "*"
+
+---
+
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: User
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationpolicyuserattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicyuserattachment
+  name: example-organizationpolicyuserattachment
+spec:
+  forProvider:
+    name: uptest-pua-user
+    email: ${Rand.RFC1123Subdomain}@example.com
+    passwordSecretRef:
+      name: example-organizationpolicyuserattachment-user-password
+      namespace: upbound-system
+      key: password
+  initProvider:
+    passwordSecretRef:
+      name: example-organizationpolicyuserattachment-user-password
+      namespace: upbound-system
+      key: password
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-organizationpolicyuserattachment-user-password
+  namespace: upbound-system
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicyuserattachment
+type: Opaque
+stringData:
+  password: SuperSecure-Passw0rd!26

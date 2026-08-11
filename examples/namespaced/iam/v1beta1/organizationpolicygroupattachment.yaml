@@ -1,0 +1,58 @@
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OrganizationPolicyGroupAttachment
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationpolicygroupattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicygroupattachment
+  name: example-organizationpolicygroupattachment
+  namespace: upbound-system
+spec:
+  forProvider:
+    policyIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationpolicygroupattachment
+    groupIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-organizationpolicygroupattachment
+
+---
+
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OrganizationPolicy
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationpolicygroupattachment
+    uptest.upbound.io/pre-delete-hook: ../testhooks/delete-organizationpolicygroupattachment.sh
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicygroupattachment
+  name: example-organizationpolicygroupattachment
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: uptest-pga-policy
+    description: example policy for group attachment
+    document:
+      version: "2012-10-17"
+      statement:
+        - actions:
+            - network.dns.*
+          effect: Allow
+          resources:
+            - "*"
+
+---
+
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OrganizationGroup
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationpolicygroupattachment
+  labels:
+    testing.upbound.io/example-name: example-organizationpolicygroupattachment
+  name: example-organizationpolicygroupattachment
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: uptest-pga-group
+    description: example group for policy attachment

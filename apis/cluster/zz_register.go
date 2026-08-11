@@ -10,16 +10,26 @@ package cluster
 import (
 	"k8s.io/apimachinery/pkg/runtime"
 
+	v1beta1 "github.com/upbound/provider-vultr/apis/cluster/compute/v1beta1"
+	v1beta1database "github.com/upbound/provider-vultr/apis/cluster/database/v1beta1"
+	v1beta1iam "github.com/upbound/provider-vultr/apis/cluster/iam/v1beta1"
+	v1beta1network "github.com/upbound/provider-vultr/apis/cluster/network/v1beta1"
+	v1beta1storage "github.com/upbound/provider-vultr/apis/cluster/storage/v1beta1"
 	v1alpha1 "github.com/upbound/provider-vultr/apis/cluster/v1alpha1"
-	v1beta1 "github.com/upbound/provider-vultr/apis/cluster/v1beta1"
+	v1beta1cluster "github.com/upbound/provider-vultr/apis/cluster/v1beta1"
 	v1beta1vke "github.com/upbound/provider-vultr/apis/cluster/vke/v1beta1"
 )
 
 func init() {
 	// Register the types with the Scheme so the components can map objects to GroupVersionKinds and back
 	AddToSchemes = append(AddToSchemes,
-		v1alpha1.SchemeBuilder.AddToScheme,
 		v1beta1.SchemeBuilder.AddToScheme,
+		v1beta1database.SchemeBuilder.AddToScheme,
+		v1beta1iam.SchemeBuilder.AddToScheme,
+		v1beta1network.SchemeBuilder.AddToScheme,
+		v1beta1storage.SchemeBuilder.AddToScheme,
+		v1alpha1.SchemeBuilder.AddToScheme,
+		v1beta1cluster.SchemeBuilder.AddToScheme,
 		v1beta1vke.SchemeBuilder.AddToScheme,
 	)
 }

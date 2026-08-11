@@ -1,0 +1,13 @@
+apiVersion: iam.vultr.upbound.io/v1beta1
+kind: OrganizationInvitation
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/organizationinvitation
+    upjet.upbound.io/manual-intervention: The upstream delete is a no-op, so every automated run would leak an invitation on the Vultr side; invites can only be revoked manually via the API.
+  labels:
+    testing.upbound.io/example-name: example-organizationinvitation
+  name: example-organizationinvitation
+spec:
+  forProvider:
+    email: ${Rand.RFC1123Subdomain}@example.com
+    apiEnabled: true

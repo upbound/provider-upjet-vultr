@@ -1,0 +1,16 @@
+apiVersion: iam.vultr.m.upbound.io/v1beta1
+kind: OIDCToken
+metadata:
+  annotations:
+    meta.upbound.io/example-id: iam/v1beta1/oidctoken
+  labels:
+    testing.upbound.io/example-name: my_token
+  name: my-token
+  namespace: upbound-system
+spec:
+  forProvider:
+    clientId: id
+    clientSecretSecretRef:
+      key: example-key
+      name: example-secret
+    grantType: external

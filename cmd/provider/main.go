@@ -36,6 +36,7 @@ import (
 	clusterapis "github.com/upbound/provider-vultr/apis/cluster"
 	namespacedapis "github.com/upbound/provider-vultr/apis/namespaced"
 	"github.com/upbound/provider-vultr/config"
+	resolverapis "github.com/upbound/provider-vultr/internal/apis"
 	"github.com/upbound/provider-vultr/internal/clients"
 	clustercontroller "github.com/upbound/provider-vultr/internal/controller/cluster"
 	namespacedcontroller "github.com/upbound/provider-vultr/internal/controller/namespaced"
@@ -74,6 +75,8 @@ func main() {
 	)
 
 	kingpin.MustParse(app.Parse(os.Args[1:]))
+	kingpin.FatalIfError(resolverapis.BuildScheme(clusterapis.AddToSchemes), "Cannot register the cluster-scoped Vultr APIs with the API resolver's runtime scheme")
+	kingpin.FatalIfError(resolverapis.BuildScheme(namespacedapis.AddToSchemes), "Cannot register the namespaced Vultr APIs with the API resolver's runtime scheme")
 	log.Default().SetOutput(io.Discard)
 	ctrl.SetLogger(zap.New(zap.WriteTo(io.Discard)))
 

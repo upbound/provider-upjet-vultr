@@ -1,0 +1,19 @@
+apiVersion: compute.vultr.m.upbound.io/v1beta1
+kind: BareMetalServer
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/baremetalserver
+  labels:
+    testing.upbound.io/example-name: example-baremetal
+  name: example-baremetal
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-baremetal
+    # Bare metal stock is region- and time-dependent; lax stocked the
+    # cheapest plan when this example was validated (ewr did not).
+    region: lax
+    plan: vbm-4c-32gb
+    osId: 2136
+  writeConnectionSecretToRef:
+    name: example-baremetal-conn

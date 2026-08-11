@@ -1,0 +1,23 @@
+apiVersion: database.vultr.m.upbound.io/v1beta1
+kind: ConnectionPool
+metadata:
+  annotations:
+    meta.upbound.io/example-id: database/v1beta1/connectionpool
+  labels:
+    testing.upbound.io/example-name: my_database_connection_pool
+  name: my-database-connection-pool
+  namespace: upbound-system
+spec:
+  forProvider:
+    databaseIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: my_database
+    databaseSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example
+    mode: transaction
+    name: my_database_connection_pool_name
+    size: 3
+    usernameSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example

@@ -1,0 +1,14 @@
+apiVersion: compute.vultr.m.upbound.io/v1beta1
+kind: Inference
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/inference
+  labels:
+    testing.upbound.io/example-name: example-inference
+  name: example-inference
+  namespace: upbound-system
+spec:
+  forProvider:
+    label: example-inference
+  writeConnectionSecretToRef:
+    name: example-inference-conn

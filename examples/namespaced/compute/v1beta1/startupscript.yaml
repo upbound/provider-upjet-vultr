@@ -1,0 +1,13 @@
+apiVersion: compute.vultr.m.upbound.io/v1beta1
+kind: StartupScript
+metadata:
+  annotations:
+    meta.upbound.io/example-id: compute/v1beta1/startupscript
+  labels:
+    testing.upbound.io/example-name: example-script
+  name: example-script
+  namespace: upbound-system
+spec:
+  forProvider:
+    name: example-script
+    script: ZWNobyAkUEFUSAo=
