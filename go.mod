@@ -1,6 +1,6 @@
 module github.com/upbound/provider-vultr
 
-go 1.26.5
+go 1.27.3
 
 tool golang.org/x/tools/cmd/goimports
 
