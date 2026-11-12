@@ -219,34 +219,50 @@ local-deploy: build controlplane.up $(YQ)
 
 e2e: local-deploy uptest
 
+# Base ref that crddiff and schema-version-diff compare against. GITHUB_BASE_REF
+# is set on pull_request events; locally the default is origin/main.
+CRDDIFF_BASE_REF ?= origin/$(or $(GITHUB_BASE_REF),main)
+# Space-separated CRD paths to check. CI passes the files changed by the pull
+# request; locally every CRD that differs from the base ref is checked.
+MODIFIED_CRD_LIST ?= $(shell git diff --name-only --diff-filter=ACMR $(CRDDIFF_BASE_REF) -- package/crds/)
+
+# Advisory: reports breaking OpenAPI v3 schema changes per CRD but never fails.
+# --enable-upjet-extensions presumes Upjet's spec.forProvider CEL rules and
+# refuses to load a CRD without that field, so the ProviderConfig CRDs are
+# compared without it.
 crddiff:
-	@$(INFO) Checking breaking CRD schema changes
-	@for crd in $${MODIFIED_CRD_LIST}; do \
-		if ! git cat-file -e "$${GITHUB_BASE_REF}:$${crd}" 2>/dev/null; then \
-			echo "CRD $${crd} does not exist in the $${GITHUB_BASE_REF} branch. Skipping..." ; \
+	@$(INFO) Checking breaking CRD schema changes against $(CRDDIFF_BASE_REF)
+	@for crd in $(MODIFIED_CRD_LIST); do \
+		if ! git cat-file -e "$(CRDDIFF_BASE_REF):$${crd}" 2>/dev/null; then \
+			echo "CRD $${crd} does not exist at $(CRDDIFF_BASE_REF). Skipping..." ; \
 			continue ; \
 		fi ; \
 		echo "Checking $${crd} for breaking API changes..." ; \
-		changes_detected=$$(go run github.com/upbound/uptest/cmd/crddiff@$(CRDDIFF_VERSION) revision --enable-upjet-extensions <(git cat-file -p "$${GITHUB_BASE_REF}:$${crd}") "$${crd}" 2>&1) ; \
-		if [[ $$? != 0 ]] ; then \
-			printf "\033[31m"; echo "Breaking change detected!"; printf "\033[0m" ; \
+		upjet_extensions="" ; \
+		if grep -q '^ *forProvider:' "$${crd}" ; then upjet_extensions="--enable-upjet-extensions" ; fi ; \
+		if ! changes_detected=$$(set -o pipefail; go run github.com/upbound/uptest/cmd/crddiff@$(CRDDIFF_VERSION) revision $${upjet_extensions} <(git cat-file -p "$(CRDDIFF_BASE_REF):$${crd}") "$${crd}" 2>&1 | sed '/^exit status [0-9]*$$/d') ; then \
+			printf "\033[31m"; echo "Breaking change detected in $${crd}!"; printf "\033[0m" ; \
 			echo "$${changes_detected}" ; \
 			echo ; \
+			if [ -n "$${GITHUB_ACTIONS}" ]; then \
+				echo "::warning file=$${crd}::Breaking CRD schema change detected, see the job summary" ; \
+				{ echo "### Breaking CRD schema change: $${crd}" ; echo '```' ; echo "$${changes_detected}" ; echo '```' ; echo ; } >> "$${GITHUB_STEP_SUMMARY}" ; \
+			fi ; \
 		fi ; \
 	done
 	@$(OK) Checking breaking CRD schema changes
 
 schema-version-diff:
-	@$(INFO) Checking for native state schema version changes
-	@export PREV_PROVIDER_VERSION=$$(git cat-file -p "${GITHUB_BASE_REF}:Makefile" | sed -nr 's/^export[[:space:]]*TERRAFORM_PROVIDER_VERSION[[:space:]]*[\?:]?=[[:space:]]*(.+)/\1/p'); \
+	@$(INFO) Checking for native state schema version changes against $(CRDDIFF_BASE_REF)
+	@export PREV_PROVIDER_VERSION=$$(git cat-file -p "$(CRDDIFF_BASE_REF):Makefile" | sed -nr 's/^export[[:space:]]*TERRAFORM_PROVIDER_VERSION[[:space:]]*[\?:]?=[[:space:]]*(.+)/\1/p'); \
 	echo Detected previous Terraform provider version: $${PREV_PROVIDER_VERSION}; \
 	echo Current Terraform provider version: $${TERRAFORM_PROVIDER_VERSION}; \
 	mkdir -p $(WORK_DIR); \
-	git cat-file -p "$${GITHUB_BASE_REF}:config/schema.json" > "$(WORK_DIR)/schema.json.$${PREV_PROVIDER_VERSION}"; \
+	git cat-file -p "$(CRDDIFF_BASE_REF):config/schema.json" > "$(WORK_DIR)/schema.json.$${PREV_PROVIDER_VERSION}"; \
 	./scripts/version_diff.py config/generated.lst "$(WORK_DIR)/schema.json.$${PREV_PROVIDER_VERSION}" config/schema.json
 	@$(OK) Checking for native state schema version changes
 
-.PHONY: cobertura submodules fallthrough run crds.clean schema-version-diff
+.PHONY: cobertura submodules fallthrough run crds.clean crddiff schema-version-diff
 
 # ====================================================================================
 # Special Targets

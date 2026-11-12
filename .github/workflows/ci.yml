@@ -27,36 +27,43 @@ jobs:
           paths_ignore: '["**.md", "**.png", "**.jpg"]'
           do_not_skip: '["workflow_dispatch", "schedule", "push"]'
 
-  # TODO: uncomment after initial commit is merged
-  # report-breaking-changes:
-  #   runs-on: ubuntu-24.04
-  #   needs: detect-noop
-  #   if: needs.detect-noop.outputs.noop != 'true'
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-  #       with:
-  #         submodules: true
+  report-breaking-changes:
+    runs-on: ubuntu-26.04
+    needs: detect-noop
+    if: needs.detect-noop.outputs.noop != 'true' && github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+          # Both reports read files from origin/<base branch>, which a
+          # depth-1 checkout of the pull request merge ref does not contain.
+          fetch-depth: 0
 
-  #     - name: Get modified CRDs
-  #       id: modified-crds
-  #       uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-  #       with:
-  #         files: |
-  #           package/crds/**
+      - name: Setup Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
 
-  #     - name: Report breaking CRD OpenAPI v3 schema changes
-  #       if: steps.modified-crds.outputs.any_changed == 'true'
-  #       env:
-  #         MODIFIED_CRD_LIST: ${{ steps.modified-crds.outputs.all_changed_files }}
-  #       run: |
-  #         make crddiff
+      - name: Get modified CRDs
+        id: modified-crds
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
+        with:
+          files: |
+            package/crds/**
 
-  #     - name: Report native schema version changes
-  #       if: ${{ inputs.upjet-based-provider }}
-  #       run: |
-  #         make schema-version-diff
+      # Advisory only: a detected change is annotated on the pull request and
+      # written to the job summary, the step never fails.
+      - name: Report breaking CRD OpenAPI v3 schema changes
+        if: steps.modified-crds.outputs.any_changed == 'true'
+        env:
+          MODIFIED_CRD_LIST: ${{ steps.modified-crds.outputs.all_changed_files }}
+        run: |
+          make crddiff
 
+      - name: Report native schema version changes
+        run: |
+          make schema-version-diff
 
   lint:
     runs-on: ubuntu-26.04
