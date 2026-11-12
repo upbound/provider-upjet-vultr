@@ -685,13 +685,6 @@ spec:
                     description: The scheme used for the default user. Possible values
                       are root or limited (linux servers only).
                     type: string
-                  vpc2Ids:
-                    description: (Deprecated) A list of VPC 2.0 IDs to be attached
-                      to the server.
-                    items:
-                      type: string
-                    type: array
-                    x-kubernetes-list-type: set
                   vpcIds:
                     description: A list of VPC IDs to be attached to the server.
                     items:
@@ -1406,13 +1399,6 @@ spec:
                     description: The scheme used for the default user. Possible values
                       are root or limited (linux servers only).
                     type: string
-                  vpc2Ids:
-                    description: (Deprecated) A list of VPC 2.0 IDs to be attached
-                      to the server.
-                    items:
-                      type: string
-                    type: array
-                    x-kubernetes-list-type: set
                   vpcIds:
                     description: A list of VPC IDs to be attached to the server.
                     items:
@@ -1821,13 +1807,6 @@ spec:
                     description: The number of virtual CPUs available on the server.
                     format: int64
                     type: integer
-                  vpc2Ids:
-                    description: (Deprecated) A list of VPC 2.0 IDs to be attached
-                      to the server.
-                    items:
-                      type: string
-                    type: array
-                    x-kubernetes-list-type: set
                   vpcIds:
                     description: A list of VPC IDs to be attached to the server.
                     items:

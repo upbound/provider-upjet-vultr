@@ -59,6 +59,7 @@ import (
 	objectstorage "github.com/upbound/provider-vultr/internal/controller/cluster/storage/objectstorage"
 	objectstoragebucket "github.com/upbound/provider-vultr/internal/controller/cluster/storage/objectstoragebucket"
 	virtualfilesystemstorage "github.com/upbound/provider-vultr/internal/controller/cluster/storage/virtualfilesystemstorage"
+	clusterauth "github.com/upbound/provider-vultr/internal/controller/cluster/vke/clusterauth"
 	kubernetes "github.com/upbound/provider-vultr/internal/controller/cluster/vke/kubernetes"
 	kubernetesnodepool "github.com/upbound/provider-vultr/internal/controller/cluster/vke/kubernetesnodepool"
 )
@@ -117,6 +118,7 @@ func Setup(mgr ctrl.Manager, o controller.Options) error {
 		objectstorage.Setup,
 		objectstoragebucket.Setup,
 		virtualfilesystemstorage.Setup,
+		clusterauth.Setup,
 		kubernetes.Setup,
 		kubernetesnodepool.Setup,
 	} {
@@ -181,6 +183,7 @@ func SetupGated(mgr ctrl.Manager, o controller.Options) error {
 		objectstorage.SetupGated,
 		objectstoragebucket.SetupGated,
 		virtualfilesystemstorage.SetupGated,
+		clusterauth.SetupGated,
 		kubernetes.SetupGated,
 		kubernetesnodepool.SetupGated,
 	} {
@@ -244,6 +247,7 @@ func SetupWebhookWithManager(mgr ctrl.Manager) error {
 		objectstorage.SetupWebhookWithManager,
 		objectstoragebucket.SetupWebhookWithManager,
 		virtualfilesystemstorage.SetupWebhookWithManager,
+		clusterauth.SetupWebhookWithManager,
 		kubernetes.SetupWebhookWithManager,
 		kubernetesnodepool.SetupWebhookWithManager,
 	} {

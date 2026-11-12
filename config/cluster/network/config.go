@@ -26,6 +26,12 @@ func Configure(p *config.Provider) {
 		r.References["vpc"] = config.Reference{
 			TerraformName: "vultr_vpc",
 		}
+		// Terraform provider v2.33.0 changed global_regions from a set of
+		// region IDs to a list of objects, which v1beta2 exposes. v1beta1
+		// keeps serving the previous shape through a conversion.
+		r.Version = "v1beta2"
+		r.PreviousVersions = []string{"v1beta1"}
+		r.Conversions = loadBalancerGlobalRegionsConversions()
 	})
 
 	p.AddResourceConfigurator("vultr_nat_gateway", func(r *config.Resource) {

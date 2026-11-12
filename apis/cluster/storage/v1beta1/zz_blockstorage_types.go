@@ -61,7 +61,7 @@ type BlockStorageObservation struct {
 	Bootable *bool `json:"bootable,omitempty" tf:"bootable,omitempty"`
 
 	// The monthly cost of this block storage.
-	Cost *int64 `json:"cost,omitempty" tf:"cost,omitempty"`
+	Cost *float64 `json:"cost,omitempty" tf:"cost,omitempty"`
 
 	// The date this block storage was created.
 	DateCreated *string `json:"dateCreated,omitempty" tf:"date_created,omitempty"`

@@ -222,7 +222,7 @@ func (in *BlockStorageObservation) DeepCopyInto(out *BlockStorageObservation) {
 	}
 	if in.Cost != nil {
 		in, out := &in.Cost, &out.Cost
-		*out = new(int64)
+		*out = new(float64)
 		**out = **in
 	}
 	if in.DateCreated != nil {

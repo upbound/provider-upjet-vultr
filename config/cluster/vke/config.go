@@ -5,14 +5,16 @@
 package vke
 
 import (
-	"encoding/base64"
-
-	"github.com/crossplane/crossplane-runtime/v2/pkg/errors"
 	"github.com/crossplane/upjet/v2/pkg/config"
 )
 
 // Configure configures the vke group
 func Configure(p *config.Provider) {
+	// ClusterAuth is a hand-written resource: the Terraform provider no
+	// longer exposes the kubeconfig on vultr_kubernetes, so a dedicated
+	// controller fetches it from the Vultr API and publishes it.
+	p.BasePackages.ControllerMap["vke/clusterauth"] = "vke"
+
 	p.AddResourceConfigurator("vultr_kubernetes", func(r *config.Resource) {
 		r.UseAsync = true
 		r.References["vpc_id"] = config.Reference{
@@ -22,19 +24,6 @@ func Configure(p *config.Provider) {
 		// it into spec would make the provider fight the autoscaler.
 		r.LateInitializer = config.LateInitializer{
 			IgnoredFields: []string{"node_pools.node_quantity"},
-		}
-		// The kube_config attribute is base64-encoded; publish the decoded
-		// kubeconfig so consumers can mount it directly.
-		r.Sensitive.AdditionalConnectionDetailsFn = func(attr map[string]any) (map[string][]byte, error) {
-			conn := map[string][]byte{}
-			if kc, ok := attr["kube_config"].(string); ok && kc != "" {
-				decoded, err := base64.StdEncoding.DecodeString(kc)
-				if err != nil {
-					return nil, errors.Wrap(err, "cannot base64-decode the kube_config attribute")
-				}
-				conn["kubeconfig"] = decoded
-			}
-			return conn, nil
 		}
 	})
 
