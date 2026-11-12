@@ -16,6 +16,7 @@ spec:
     label: example-vke-nodepool
     plan: vc2-1c-2gb
     nodeQuantity: 1
+    vpcOnly: false
 
 ---
 

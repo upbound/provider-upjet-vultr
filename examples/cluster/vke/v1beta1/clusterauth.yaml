@@ -1,0 +1,39 @@
+apiVersion: vke.vultr.upbound.io/v1beta1
+kind: ClusterAuth
+metadata:
+  annotations:
+    meta.upbound.io/example-id: vke/v1beta1/clusterauth
+    uptest.upbound.io/timeout: "1800"
+    uptest.upbound.io/post-assert-hook: ../testhooks/check-clusterauth.sh
+  labels:
+    testing.upbound.io/example-name: example-vke-auth
+  name: example-vke-auth
+spec:
+  forProvider:
+    clusterIdSelector:
+      matchLabels:
+        testing.upbound.io/example-name: example-vke-auth
+  writeConnectionSecretToRef:
+    name: example-vke-auth-kubeconfig
+    namespace: upbound-system
+
+---
+
+apiVersion: vke.vultr.upbound.io/v1beta1
+kind: Kubernetes
+metadata:
+  annotations:
+    meta.upbound.io/example-id: vke/v1beta1/clusterauth
+    uptest.upbound.io/timeout: "1800"
+  labels:
+    testing.upbound.io/example-name: example-vke-auth
+  name: example-vke-auth
+spec:
+  forProvider:
+    label: example-vke-auth
+    region: ewr
+    version: v1.36.1+3
+    nodePools:
+      label: example-vke-pool
+      plan: vc2-1c-2gb
+      nodeQuantity: 1

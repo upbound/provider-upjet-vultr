@@ -20,8 +20,7 @@ spec:
       autoScaler: true
       minNodes: 1
       maxNodes: 2
+      vpcOnly: false
       labels:
         - key: example.upbound.io/pool
           value: system
-  writeConnectionSecretToRef:
-    name: example-vke-kubeconfig
