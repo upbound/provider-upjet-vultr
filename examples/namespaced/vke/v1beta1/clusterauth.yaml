@@ -33,7 +33,7 @@ spec:
   forProvider:
     label: example-vke-auth
     region: ewr
-    version: v1.36.1+3
+    version: v1.37.2+1
     nodePools:
       label: example-vke-pool
       plan: vc2-1c-2gb
