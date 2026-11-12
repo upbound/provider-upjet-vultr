@@ -211,7 +211,14 @@ build-provider-vultr: do.build.images
 
 XPKG_SKIP_DEP_RESOLUTION := true
 
-local-deploy: build controlplane.up $(YQ)
+# local.xpkg.sync loads every package found under $(XPKG_OUTPUT_DIR) into the
+# Crossplane package cache under the same name, so the last file in glob order
+# wins. A package left over from an earlier build would then be deployed with
+# its outdated CRDs next to the freshly built controller image.
+local.xpkg.clean:
+	@rm -rf $(XPKG_OUTPUT_DIR)
+
+local-deploy: local.xpkg.clean build controlplane.up $(YQ)
 	$(MAKE) local.xpkg.deploy.provider.$(PROJECT_NAME) DRC_FILE="./examples/deploymentruntimeconfig.yaml" && \
 	$(INFO) running locally built provider && \
 	$(KUBECTL) wait provider.pkg $(PROJECT_NAME) --for condition=Healthy --timeout 5m && \
@@ -302,7 +309,7 @@ example-lint: $(KUBECTL_VALIDATE)
 	rm -rf "$$tmpdir"; \
 	[ "$$failed" -eq 0 ] && $(OK) linted example manifests || $(FAIL)
 
-.PHONY: cobertura submodules fallthrough run crds.clean crddiff schema-version-diff example-lint
+.PHONY: cobertura submodules fallthrough run crds.clean crddiff schema-version-diff example-lint local.xpkg.clean
 
 # ====================================================================================
 # Special Targets
