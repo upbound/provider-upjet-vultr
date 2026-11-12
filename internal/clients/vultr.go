@@ -3,12 +3,15 @@ package clients
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/crossplane/crossplane-runtime/v2/pkg/errors"
 	"github.com/crossplane/crossplane-runtime/v2/pkg/resource"
 	xpv2 "github.com/crossplane/crossplane/apis/v2/core/v2"
 	terraformsdk "github.com/hashicorp/terraform-plugin-sdk/v2/terraform"
+	"github.com/vultr/govultr/v3"
 	"github.com/vultr/terraform-provider-vultr/vultr"
+	"golang.org/x/oauth2"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -25,6 +28,9 @@ const (
 	errTrackUsage           = "cannot track ProviderConfig usage"
 	errExtractCredentials   = "cannot extract credentials"
 	errUnmarshalCredentials = "cannot unmarshal vultr credentials as JSON"
+	errNoAPIKey             = `credentials secret has no "api_key" key`
+
+	userAgent = "crossplane-provider-vultr"
 
 	keyAPIKey     = "api_key"
 	keyRateLimit  = "rate_limit"
@@ -35,19 +41,9 @@ const (
 // in-process Vultr Terraform provider (no-fork, no terraform CLI).
 func TerraformSetupBuilder() terraform.SetupFn {
 	return func(ctx context.Context, client client.Client, mg resource.Managed) (terraform.Setup, error) {
-		pcSpec, err := resolveProviderConfig(ctx, client, mg)
+		creds, pcSpec, err := providerCredentials(ctx, client, mg)
 		if err != nil {
-			return terraform.Setup{}, errors.Wrap(err, "cannot resolve provider config")
-		}
-
-		data, err := resource.CommonCredentialExtractor(ctx, pcSpec.Credentials.Source, client, pcSpec.Credentials.CommonCredentialSelectors)
-		if err != nil {
-			return terraform.Setup{}, errors.Wrap(err, errExtractCredentials)
-		}
-
-		creds := map[string]string{}
-		if err := json.Unmarshal(data, &creds); err != nil {
-			return terraform.Setup{}, errors.Wrap(err, errUnmarshalCredentials)
+			return terraform.Setup{}, err
 		}
 
 		cfg, err := buildConfiguration(creds, pcSpec.RateLimit, pcSpec.RetryLimit)
@@ -60,10 +56,55 @@ func TerraformSetupBuilder() terraform.SetupFn {
 	}
 }
 
+// providerCredentials resolves the ProviderConfig referenced by the managed
+// resource and extracts the Vultr credentials it points to.
+func providerCredentials(ctx context.Context, client client.Client, mg resource.Managed) (map[string]string, *namespacedv1beta1.ProviderConfigSpec, error) {
+	pcSpec, err := resolveProviderConfig(ctx, client, mg)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "cannot resolve provider config")
+	}
+
+	data, err := resource.CommonCredentialExtractor(ctx, pcSpec.Credentials.Source, client, pcSpec.Credentials.CommonCredentialSelectors)
+	if err != nil {
+		return nil, nil, errors.Wrap(err, errExtractCredentials)
+	}
+
+	creds := map[string]string{}
+	if err := json.Unmarshal(data, &creds); err != nil {
+		return nil, nil, errors.Wrap(err, errUnmarshalCredentials)
+	}
+	return creds, pcSpec, nil
+}
+
+// NewVultrClient returns a Vultr API client configured from the ProviderConfig
+// referenced by the managed resource. It serves the controllers that talk to
+// the Vultr API directly instead of going through the Terraform provider.
+func NewVultrClient(ctx context.Context, client client.Client, mg resource.Managed) (*govultr.Client, error) {
+	creds, pcSpec, err := providerCredentials(ctx, client, mg)
+	if err != nil {
+		return nil, err
+	}
+	apiKey := creds[keyAPIKey]
+	if apiKey == "" {
+		return nil, errors.New(errNoAPIKey)
+	}
+
+	httpClient := oauth2.NewClient(context.WithoutCancel(ctx), oauth2.StaticTokenSource(&oauth2.Token{AccessToken: apiKey}))
+	vultrClient := govultr.NewClient(httpClient)
+	vultrClient.SetUserAgent(userAgent)
+	if pcSpec.RateLimit != nil && *pcSpec.RateLimit != 0 {
+		vultrClient.SetRateLimit(time.Duration(*pcSpec.RateLimit) * time.Millisecond)
+	}
+	if pcSpec.RetryLimit != nil && *pcSpec.RetryLimit != 0 {
+		vultrClient.SetRetryLimit(int(*pcSpec.RetryLimit))
+	}
+	return vultrClient, nil
+}
+
 func buildConfiguration(creds map[string]string, rateLimit, retryLimit *int64) (map[string]any, error) {
 	apiKey := creds[keyAPIKey]
 	if apiKey == "" {
-		return nil, errors.New(`credentials secret has no "api_key" key`)
+		return nil, errors.New(errNoAPIKey)
 	}
 	cfg := map[string]any{keyAPIKey: apiKey}
 	// The SDKv2 provider schema declares these as TypeInt; pass plain ints so

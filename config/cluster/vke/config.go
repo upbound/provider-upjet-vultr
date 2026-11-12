@@ -10,6 +10,11 @@ import (
 
 // Configure configures the vke group
 func Configure(p *config.Provider) {
+	// ClusterAuth is a hand-written resource: the Terraform provider no
+	// longer exposes the kubeconfig on vultr_kubernetes, so a dedicated
+	// controller fetches it from the Vultr API and publishes it.
+	p.BasePackages.ControllerMap["vke/clusterauth"] = "vke"
+
 	p.AddResourceConfigurator("vultr_kubernetes", func(r *config.Resource) {
 		r.UseAsync = true
 		r.References["vpc_id"] = config.Reference{
