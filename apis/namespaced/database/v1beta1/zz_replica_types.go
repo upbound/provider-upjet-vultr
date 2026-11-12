@@ -134,6 +134,9 @@ type ReplicaObservation struct {
 	// The configuration value for slow query logging on the managed database read replica (MySQL engine types only).
 	MySQLSlowQueryLog *bool `json:"mysqlSlowQueryLog,omitempty" tf:"mysql_slow_query_log,omitempty"`
 
+	// Charges due at the end of the billing period.
+	PendingCharges *float64 `json:"pendingCharges,omitempty" tf:"pending_charges,omitempty"`
+
 	// The managed database read replica's plan ID.
 	Plan *string `json:"plan,omitempty" tf:"plan,omitempty"`
 

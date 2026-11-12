@@ -5,9 +5,6 @@
 package vke
 
 import (
-	"encoding/base64"
-
-	"github.com/crossplane/crossplane-runtime/v2/pkg/errors"
 	"github.com/crossplane/upjet/v2/pkg/config"
 )
 
@@ -22,19 +19,6 @@ func Configure(p *config.Provider) {
 		// it into spec would make the provider fight the autoscaler.
 		r.LateInitializer = config.LateInitializer{
 			IgnoredFields: []string{"node_pools.node_quantity"},
-		}
-		// The kube_config attribute is base64-encoded; publish the decoded
-		// kubeconfig so consumers can mount it directly.
-		r.Sensitive.AdditionalConnectionDetailsFn = func(attr map[string]any) (map[string][]byte, error) {
-			conn := map[string][]byte{}
-			if kc, ok := attr["kube_config"].(string); ok && kc != "" {
-				decoded, err := base64.StdEncoding.DecodeString(kc)
-				if err != nil {
-					return nil, errors.Wrap(err, "cannot base64-decode the kube_config attribute")
-				}
-				conn["kubeconfig"] = decoded
-			}
-			return conn, nil
 		}
 	})
 

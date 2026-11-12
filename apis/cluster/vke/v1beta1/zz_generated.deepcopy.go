@@ -229,6 +229,17 @@ func (in *KubernetesNodePoolInitParameters) DeepCopyInto(out *KubernetesNodePool
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NodeRecycle != nil {
+		in, out := &in.NodeRecycle, &out.NodeRecycle
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Plan != nil {
 		in, out := &in.Plan, &out.Plan
 		*out = new(string)
@@ -249,6 +260,11 @@ func (in *KubernetesNodePoolInitParameters) DeepCopyInto(out *KubernetesNodePool
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData
 		*out = new(string)
+		**out = **in
+	}
+	if in.VPCOnly != nil {
+		in, out := &in.VPCOnly, &out.VPCOnly
+		*out = new(bool)
 		**out = **in
 	}
 }
@@ -495,6 +511,17 @@ func (in *KubernetesNodePoolObservation) DeepCopyInto(out *KubernetesNodePoolObs
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NodeRecycle != nil {
+		in, out := &in.NodeRecycle, &out.NodeRecycle
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Nodes != nil {
 		in, out := &in.Nodes, &out.Nodes
 		*out = make([]KubernetesNodePoolNodesObservation, len(*in))
@@ -527,6 +554,11 @@ func (in *KubernetesNodePoolObservation) DeepCopyInto(out *KubernetesNodePoolObs
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData
 		*out = new(string)
+		**out = **in
+	}
+	if in.VPCOnly != nil {
+		in, out := &in.VPCOnly, &out.VPCOnly
+		*out = new(bool)
 		**out = **in
 	}
 }
@@ -591,6 +623,17 @@ func (in *KubernetesNodePoolParameters) DeepCopyInto(out *KubernetesNodePoolPara
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NodeRecycle != nil {
+		in, out := &in.NodeRecycle, &out.NodeRecycle
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Plan != nil {
 		in, out := &in.Plan, &out.Plan
 		*out = new(string)
@@ -611,6 +654,11 @@ func (in *KubernetesNodePoolParameters) DeepCopyInto(out *KubernetesNodePoolPara
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData
 		*out = new(string)
+		**out = **in
+	}
+	if in.VPCOnly != nil {
+		in, out := &in.VPCOnly, &out.VPCOnly
+		*out = new(bool)
 		**out = **in
 	}
 }
@@ -1095,6 +1143,17 @@ func (in *NodePoolsInitParameters) DeepCopyInto(out *NodePoolsInitParameters) {
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NodeRecycle != nil {
+		in, out := &in.NodeRecycle, &out.NodeRecycle
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Plan != nil {
 		in, out := &in.Plan, &out.Plan
 		*out = new(string)
@@ -1110,6 +1169,11 @@ func (in *NodePoolsInitParameters) DeepCopyInto(out *NodePoolsInitParameters) {
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData
 		*out = new(string)
+		**out = **in
+	}
+	if in.VPCOnly != nil {
+		in, out := &in.VPCOnly, &out.VPCOnly
+		*out = new(bool)
 		**out = **in
 	}
 }
@@ -1174,6 +1238,17 @@ func (in *NodePoolsObservation) DeepCopyInto(out *NodePoolsObservation) {
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NodeRecycle != nil {
+		in, out := &in.NodeRecycle, &out.NodeRecycle
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Nodes != nil {
 		in, out := &in.Nodes, &out.Nodes
 		*out = make([]NodesObservation, len(*in))
@@ -1206,6 +1281,11 @@ func (in *NodePoolsObservation) DeepCopyInto(out *NodePoolsObservation) {
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData
 		*out = new(string)
+		**out = **in
+	}
+	if in.VPCOnly != nil {
+		in, out := &in.VPCOnly, &out.VPCOnly
+		*out = new(bool)
 		**out = **in
 	}
 }
@@ -1255,6 +1335,17 @@ func (in *NodePoolsParameters) DeepCopyInto(out *NodePoolsParameters) {
 		*out = new(int64)
 		**out = **in
 	}
+	if in.NodeRecycle != nil {
+		in, out := &in.NodeRecycle, &out.NodeRecycle
+		*out = make([]*string, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(string)
+				**out = **in
+			}
+		}
+	}
 	if in.Plan != nil {
 		in, out := &in.Plan, &out.Plan
 		*out = new(string)
@@ -1270,6 +1361,11 @@ func (in *NodePoolsParameters) DeepCopyInto(out *NodePoolsParameters) {
 	if in.UserData != nil {
 		in, out := &in.UserData, &out.UserData
 		*out = new(string)
+		**out = **in
+	}
+	if in.VPCOnly != nil {
+		in, out := &in.VPCOnly, &out.VPCOnly
+		*out = new(bool)
 		**out = **in
 	}
 }

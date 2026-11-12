@@ -236,8 +236,7 @@ spec:
                     type: boolean
                   cost:
                     description: The monthly cost of this block storage.
-                    format: int64
-                    type: integer
+                    type: number
                   dateCreated:
                     description: The date this block storage was created.
                     type: string

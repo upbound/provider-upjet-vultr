@@ -452,7 +452,6 @@ type LoadBalancerStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:storageversion
 
 // LoadBalancer is the Schema for the LoadBalancers API. Get information about a Vultr Load Balancer.
 // +kubebuilder:printcolumn:name="SYNCED",type="string",JSONPath=".status.conditions[?(@.type=='Synced')].status"

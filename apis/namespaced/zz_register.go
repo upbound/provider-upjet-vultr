@@ -14,6 +14,7 @@ import (
 	v1beta1database "github.com/upbound/provider-vultr/apis/namespaced/database/v1beta1"
 	v1beta1iam "github.com/upbound/provider-vultr/apis/namespaced/iam/v1beta1"
 	v1beta1network "github.com/upbound/provider-vultr/apis/namespaced/network/v1beta1"
+	v1beta2 "github.com/upbound/provider-vultr/apis/namespaced/network/v1beta2"
 	v1beta1storage "github.com/upbound/provider-vultr/apis/namespaced/storage/v1beta1"
 	v1alpha1 "github.com/upbound/provider-vultr/apis/namespaced/v1alpha1"
 	v1beta1namespaced "github.com/upbound/provider-vultr/apis/namespaced/v1beta1"
@@ -27,6 +28,7 @@ func init() {
 		v1beta1database.SchemeBuilder.AddToScheme,
 		v1beta1iam.SchemeBuilder.AddToScheme,
 		v1beta1network.SchemeBuilder.AddToScheme,
+		v1beta2.SchemeBuilder.AddToScheme,
 		v1beta1storage.SchemeBuilder.AddToScheme,
 		v1alpha1.SchemeBuilder.AddToScheme,
 		v1beta1namespaced.SchemeBuilder.AddToScheme,

@@ -13,7 +13,7 @@ TERRAFORM_VERSION_VALID := $(shell [ "$(TERRAFORM_VERSION)" = "`printf "$(TERRAF
 
 export TERRAFORM_PROVIDER_SOURCE ?= vultr/vultr
 export TERRAFORM_PROVIDER_REPO ?= https://github.com/vultr/terraform-provider-vultr
-export TERRAFORM_PROVIDER_VERSION ?= 2.32.0
+export TERRAFORM_PROVIDER_VERSION ?= 2.33.2
 export TERRAFORM_DOCS_PATH ?= website/docs/r
 export PROVIDER_NAME
 
