@@ -83,9 +83,15 @@ XPKG_REG_ORGS ?= xpkg.upbound.io/upbound
 # inferred.
 XPKG_REG_ORGS_NO_PROMOTE ?= xpkg.upbound.io/upbound
 XPKGS = $(PROJECT_NAME)
+# The package is built from a copy of package/ whose CRDs are patched to
+# enable the conversion webhook, see the kustomize-crds target.
+XPKG_DIR = $(OUTPUT_DIR)/package
+XPKG_IGNORE = kustomize/*,crds/kustomization.yaml
 
 export XPKG_REG_ORGS := $(XPKG_REG_ORGS)
 export XPKG_REG_ORGS_NO_PROMOTE := $(XPKG_REG_ORGS_NO_PROMOTE)
+export XPKG_DIR := $(XPKG_DIR)
+export XPKG_IGNORE := $(XPKG_IGNORE)
 
 -include build/makelib/xpkg.mk
 
@@ -272,6 +278,20 @@ go.lint.analysiskey:
 	@echo $$(make go.lint.analysiskey-interval)$$(sha1sum go.sum | cut -d' ' -f1)
 
 .PHONY: crossplane.help help-special go.mod.cachedir go.lint.analysiskey-interval go.lint.analysiskey
+
+build.init: kustomize-crds
+
+kustomize-crds: output.init $(KUSTOMIZE) $(YQ)
+	@$(INFO) Kustomizing CRDs...
+	@rm -fr $(OUTPUT_DIR)/package || $(FAIL)
+	@cp -R package $(OUTPUT_DIR) && \
+	cd $(OUTPUT_DIR)/package/crds && \
+	$(KUSTOMIZE) create --autodetect || $(FAIL)
+	@export YQ=$(YQ) && \
+	XDG_CONFIG_HOME=$(PWD)/package $(KUSTOMIZE) build --enable-alpha-plugins $(OUTPUT_DIR)/package/kustomize -o $(OUTPUT_DIR)/package/crds.yaml || $(FAIL)
+	@$(OK) Kustomizing CRDs.
+
+.PHONY: kustomize-crds
 
 # TODO(negz): Update CI to use these targets.
 vendor: modules.download
