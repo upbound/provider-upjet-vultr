@@ -11,7 +11,7 @@ spec:
   forProvider:
     label: example-vke
     region: ewr
-    version: v1.36.1+3
+    version: v1.37.2+1
     haControlplanes: true
     nodePools:
       label: example-vke-pool
@@ -20,8 +20,7 @@ spec:
       autoScaler: true
       minNodes: 1
       maxNodes: 2
+      vpcOnly: false
       labels:
         - key: example.upbound.io/pool
           value: system
-  writeConnectionSecretToRef:
-    name: example-vke-kubeconfig

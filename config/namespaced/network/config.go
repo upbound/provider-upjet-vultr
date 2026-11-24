@@ -26,6 +26,18 @@ func Configure(p *config.Provider) {
 		r.References["vpc"] = config.Reference{
 			TerraformName: "vultr_vpc",
 		}
+		// Terraform provider v2.33.0 changed global_regions from a set of
+		// region IDs to a list of objects, which v1beta2 exposes. v1beta1
+		// keeps serving the previous shape through a conversion.
+		r.Version = "v1beta2"
+		// per the API versioning policy storage is kept as v1beta1 for at least one minor release
+		r.SetCRDStorageVersion("v1beta1")
+		// The controller reconciles v1beta2, which has every field. Left
+		// unset, upjet merges the field conversion annotation back into the
+		// Terraform state and cannot resolve its indexed paths.
+		r.ControllerReconcileVersion = r.Version //nolint:staticcheck // upjet does not default it at runtime
+		r.PreviousVersions = []string{"v1beta1"}
+		r.Conversions = loadBalancerGlobalRegionsConversions()
 	})
 
 	p.AddResourceConfigurator("vultr_nat_gateway", func(r *config.Resource) {

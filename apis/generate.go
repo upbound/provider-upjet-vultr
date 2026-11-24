@@ -8,7 +8,9 @@
 //go:generate rm -rf ../package/crds
 
 // Remove generated files
-//go:generate bash -c "find . -iname 'zz_*' ! -iname 'zz_generated.managed*.go' -delete"
+// The types of a previous API version are frozen: Upjet only generates the
+// current version of a resource, so they must survive the cleanup.
+//go:generate bash -c "find . -iname 'zz_*' ! -iname 'zz_generated.managed*.go' ! -path './*/network/v1beta1/zz_loadbalancer_*' -delete"
 //go:generate bash -c "find . -type d -empty -delete"
 //go:generate bash -c "find ../internal/controller -iname 'zz_*' -delete"
 //go:generate bash -c "find ../internal/controller -type d -empty -delete"

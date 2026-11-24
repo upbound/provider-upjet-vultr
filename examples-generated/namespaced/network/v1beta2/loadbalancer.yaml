@@ -1,8 +1,8 @@
-apiVersion: network.vultr.m.upbound.io/v1beta1
+apiVersion: network.vultr.m.upbound.io/v1beta2
 kind: LoadBalancer
 metadata:
   annotations:
-    meta.upbound.io/example-id: network/v1beta1/loadbalancer
+    meta.upbound.io/example-id: network/v1beta2/loadbalancer
   labels:
     testing.upbound.io/example-name: lb
   name: lb

@@ -225,6 +225,10 @@ type NodePoolsInitParameters struct {
 	// The number of nodes in this node pool.
 	NodeQuantity *int64 `json:"nodeQuantity,omitempty" tf:"node_quantity,omitempty"`
 
+	// A list of node IDs to recycle. This will increase the node pool size with new nodes and automatically remove the recycled nodes.
+	// +listType=set
+	NodeRecycle []*string `json:"nodeRecycle,omitempty" tf:"node_recycle,omitempty"`
+
 	// The plan to be used in this node pool. See plans list Note the minimum plan requirements must have at least 1 core and 2 gbs of memory.
 	Plan *string `json:"plan,omitempty" tf:"plan,omitempty"`
 
@@ -232,6 +236,9 @@ type NodePoolsInitParameters struct {
 
 	// A base64 encoded string containing the user data to apply to nodes in the node pool.
 	UserData *string `json:"userData,omitempty" tf:"user_data,omitempty"`
+
+	// Enable private-only VPC connectivity for nodes. If true, nodes can only access the internet via the NAT Gateway attached to the VPC.
+	VPCOnly *bool `json:"vpcOnly,omitempty" tf:"vpc_only,omitempty"`
 }
 
 type NodePoolsObservation struct {
@@ -262,6 +269,10 @@ type NodePoolsObservation struct {
 	// The number of nodes in this node pool.
 	NodeQuantity *int64 `json:"nodeQuantity,omitempty" tf:"node_quantity,omitempty"`
 
+	// A list of node IDs to recycle. This will increase the node pool size with new nodes and automatically remove the recycled nodes.
+	// +listType=set
+	NodeRecycle []*string `json:"nodeRecycle,omitempty" tf:"node_recycle,omitempty"`
+
 	Nodes []NodesObservation `json:"nodes,omitempty" tf:"nodes,omitempty"`
 
 	// The plan to be used in this node pool. See plans list Note the minimum plan requirements must have at least 1 core and 2 gbs of memory.
@@ -277,6 +288,9 @@ type NodePoolsObservation struct {
 
 	// A base64 encoded string containing the user data to apply to nodes in the node pool.
 	UserData *string `json:"userData,omitempty" tf:"user_data,omitempty"`
+
+	// Enable private-only VPC connectivity for nodes. If true, nodes can only access the internet via the NAT Gateway attached to the VPC.
+	VPCOnly *bool `json:"vpcOnly,omitempty" tf:"vpc_only,omitempty"`
 }
 
 type NodePoolsParameters struct {
@@ -304,6 +318,11 @@ type NodePoolsParameters struct {
 	// +kubebuilder:validation:Optional
 	NodeQuantity *int64 `json:"nodeQuantity" tf:"node_quantity,omitempty"`
 
+	// A list of node IDs to recycle. This will increase the node pool size with new nodes and automatically remove the recycled nodes.
+	// +kubebuilder:validation:Optional
+	// +listType=set
+	NodeRecycle []*string `json:"nodeRecycle,omitempty" tf:"node_recycle,omitempty"`
+
 	// The plan to be used in this node pool. See plans list Note the minimum plan requirements must have at least 1 core and 2 gbs of memory.
 	// +kubebuilder:validation:Optional
 	Plan *string `json:"plan" tf:"plan,omitempty"`
@@ -314,6 +333,10 @@ type NodePoolsParameters struct {
 	// A base64 encoded string containing the user data to apply to nodes in the node pool.
 	// +kubebuilder:validation:Optional
 	UserData *string `json:"userData,omitempty" tf:"user_data,omitempty"`
+
+	// Enable private-only VPC connectivity for nodes. If true, nodes can only access the internet via the NAT Gateway attached to the VPC.
+	// +kubebuilder:validation:Optional
+	VPCOnly *bool `json:"vpcOnly,omitempty" tf:"vpc_only,omitempty"`
 }
 
 type NodesInitParameters struct {

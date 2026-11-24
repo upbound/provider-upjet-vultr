@@ -2132,6 +2132,11 @@ func (in *ReadReplicasObservation) DeepCopyInto(out *ReadReplicasObservation) {
 		*out = new(bool)
 		**out = **in
 	}
+	if in.PendingCharges != nil {
+		in, out := &in.PendingCharges, &out.PendingCharges
+		*out = new(float64)
+		**out = **in
+	}
 	if in.Plan != nil {
 		in, out := &in.Plan, &out.Plan
 		*out = new(string)
@@ -2592,6 +2597,11 @@ func (in *ReplicaObservation) DeepCopyInto(out *ReplicaObservation) {
 	if in.MySQLSlowQueryLog != nil {
 		in, out := &in.MySQLSlowQueryLog, &out.MySQLSlowQueryLog
 		*out = new(bool)
+		**out = **in
+	}
+	if in.PendingCharges != nil {
+		in, out := &in.PendingCharges, &out.PendingCharges
+		*out = new(float64)
 		**out = **in
 	}
 	if in.Plan != nil {

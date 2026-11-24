@@ -13,7 +13,7 @@ TERRAFORM_VERSION_VALID := $(shell [ "$(TERRAFORM_VERSION)" = "`printf "$(TERRAF
 
 export TERRAFORM_PROVIDER_SOURCE ?= vultr/vultr
 export TERRAFORM_PROVIDER_REPO ?= https://github.com/vultr/terraform-provider-vultr
-export TERRAFORM_PROVIDER_VERSION ?= 2.32.0
+export TERRAFORM_PROVIDER_VERSION ?= 2.33.2
 export TERRAFORM_DOCS_PATH ?= website/docs/r
 export PROVIDER_NAME
 
@@ -62,6 +62,7 @@ YQ_VERSION = v4.40.5
 CROSSPLANE_CLI_VERSION = v2.5.0
 CRDDIFF_VERSION = v0.12.1
 CROSSPLANE_VERSION = 2.4.3
+KUBECTL_VALIDATE_VERSION ?= v0.0.4
 
 -include build/makelib/k8s_tools.mk
 
@@ -83,9 +84,15 @@ XPKG_REG_ORGS ?= xpkg.upbound.io/upbound
 # inferred.
 XPKG_REG_ORGS_NO_PROMOTE ?= xpkg.upbound.io/upbound
 XPKGS = $(PROJECT_NAME)
+# The package is built from a copy of package/ whose CRDs are patched to
+# enable the conversion webhook, see the kustomize-crds target.
+XPKG_DIR = $(OUTPUT_DIR)/package
+XPKG_IGNORE = kustomize/*,crds/kustomization.yaml
 
 export XPKG_REG_ORGS := $(XPKG_REG_ORGS)
 export XPKG_REG_ORGS_NO_PROMOTE := $(XPKG_REG_ORGS_NO_PROMOTE)
+export XPKG_DIR := $(XPKG_DIR)
+export XPKG_IGNORE := $(XPKG_IGNORE)
 
 -include build/makelib/xpkg.mk
 
@@ -204,7 +211,14 @@ build-provider-vultr: do.build.images
 
 XPKG_SKIP_DEP_RESOLUTION := true
 
-local-deploy: build controlplane.up $(YQ)
+# local.xpkg.sync loads every package found under $(XPKG_OUTPUT_DIR) into the
+# Crossplane package cache under the same name, so the last file in glob order
+# wins. A package left over from an earlier build would then be deployed with
+# its outdated CRDs next to the freshly built controller image.
+local.xpkg.clean:
+	@rm -rf $(XPKG_OUTPUT_DIR)
+
+local-deploy: local.xpkg.clean build controlplane.up $(YQ)
 	$(MAKE) local.xpkg.deploy.provider.$(PROJECT_NAME) DRC_FILE="./examples/deploymentruntimeconfig.yaml" && \
 	$(INFO) running locally built provider && \
 	$(KUBECTL) wait provider.pkg $(PROJECT_NAME) --for condition=Healthy --timeout 5m && \
@@ -213,34 +227,89 @@ local-deploy: build controlplane.up $(YQ)
 
 e2e: local-deploy uptest
 
+# Base ref that crddiff and schema-version-diff compare against. GITHUB_BASE_REF
+# is set on pull_request events; locally the default is origin/main.
+CRDDIFF_BASE_REF ?= origin/$(or $(GITHUB_BASE_REF),main)
+# Space-separated CRD paths to check. CI passes the files changed by the pull
+# request; locally every CRD that differs from the base ref is checked.
+MODIFIED_CRD_LIST ?= $(shell git diff --name-only --diff-filter=ACMR $(CRDDIFF_BASE_REF) -- package/crds/)
+
+# Advisory: reports breaking OpenAPI v3 schema changes per CRD but never fails.
+# --enable-upjet-extensions presumes Upjet's spec.forProvider CEL rules and
+# refuses to load a CRD without that field, so the ProviderConfig CRDs are
+# compared without it.
 crddiff:
-	@$(INFO) Checking breaking CRD schema changes
-	@for crd in $${MODIFIED_CRD_LIST}; do \
-		if ! git cat-file -e "$${GITHUB_BASE_REF}:$${crd}" 2>/dev/null; then \
-			echo "CRD $${crd} does not exist in the $${GITHUB_BASE_REF} branch. Skipping..." ; \
+	@$(INFO) Checking breaking CRD schema changes against $(CRDDIFF_BASE_REF)
+	@for crd in $(MODIFIED_CRD_LIST); do \
+		if ! git cat-file -e "$(CRDDIFF_BASE_REF):$${crd}" 2>/dev/null; then \
+			echo "CRD $${crd} does not exist at $(CRDDIFF_BASE_REF). Skipping..." ; \
 			continue ; \
 		fi ; \
 		echo "Checking $${crd} for breaking API changes..." ; \
-		changes_detected=$$(go run github.com/upbound/uptest/cmd/crddiff@$(CRDDIFF_VERSION) revision --enable-upjet-extensions <(git cat-file -p "$${GITHUB_BASE_REF}:$${crd}") "$${crd}" 2>&1) ; \
-		if [[ $$? != 0 ]] ; then \
-			printf "\033[31m"; echo "Breaking change detected!"; printf "\033[0m" ; \
+		upjet_extensions="" ; \
+		if grep -q '^ *forProvider:' "$${crd}" ; then upjet_extensions="--enable-upjet-extensions" ; fi ; \
+		if ! changes_detected=$$(set -o pipefail; go run github.com/upbound/uptest/cmd/crddiff@$(CRDDIFF_VERSION) revision $${upjet_extensions} <(git cat-file -p "$(CRDDIFF_BASE_REF):$${crd}") "$${crd}" 2>&1 | sed '/^exit status [0-9]*$$/d') ; then \
+			printf "\033[31m"; echo "Breaking change detected in $${crd}!"; printf "\033[0m" ; \
 			echo "$${changes_detected}" ; \
 			echo ; \
+			if [ -n "$${GITHUB_ACTIONS}" ]; then \
+				echo "::warning file=$${crd}::Breaking CRD schema change detected, see the job summary" ; \
+				{ echo "### Breaking CRD schema change: $${crd}" ; echo '```' ; echo "$${changes_detected}" ; echo '```' ; echo ; } >> "$${GITHUB_STEP_SUMMARY}" ; \
+			fi ; \
 		fi ; \
 	done
 	@$(OK) Checking breaking CRD schema changes
 
 schema-version-diff:
-	@$(INFO) Checking for native state schema version changes
-	@export PREV_PROVIDER_VERSION=$$(git cat-file -p "${GITHUB_BASE_REF}:Makefile" | sed -nr 's/^export[[:space:]]*TERRAFORM_PROVIDER_VERSION[[:space:]]*[\?:]?=[[:space:]]*(.+)/\1/p'); \
+	@$(INFO) Checking for native state schema version changes against $(CRDDIFF_BASE_REF)
+	@export PREV_PROVIDER_VERSION=$$(git cat-file -p "$(CRDDIFF_BASE_REF):Makefile" | sed -nr 's/^export[[:space:]]*TERRAFORM_PROVIDER_VERSION[[:space:]]*[\?:]?=[[:space:]]*(.+)/\1/p'); \
 	echo Detected previous Terraform provider version: $${PREV_PROVIDER_VERSION}; \
 	echo Current Terraform provider version: $${TERRAFORM_PROVIDER_VERSION}; \
 	mkdir -p $(WORK_DIR); \
-	git cat-file -p "$${GITHUB_BASE_REF}:config/schema.json" > "$(WORK_DIR)/schema.json.$${PREV_PROVIDER_VERSION}"; \
+	git cat-file -p "$(CRDDIFF_BASE_REF):config/schema.json" > "$(WORK_DIR)/schema.json.$${PREV_PROVIDER_VERSION}"; \
 	./scripts/version_diff.py config/generated.lst "$(WORK_DIR)/schema.json.$${PREV_PROVIDER_VERSION}" config/schema.json
 	@$(OK) Checking for native state schema version changes
 
-.PHONY: cobertura submodules fallthrough run crds.clean schema-version-diff
+KUBECTL_VALIDATE := $(TOOLS_HOST_DIR)/kubectl-validate-$(KUBECTL_VALIDATE_VERSION)
+
+$(KUBECTL_VALIDATE):
+	@$(INFO) installing kubectl-validate $(KUBECTL_VALIDATE_VERSION)
+	@mkdir -p $(TOOLS_HOST_DIR)
+	@GOBIN=$(abspath $(TOOLS_HOST_DIR)) go install sigs.k8s.io/kubectl-validate@$(KUBECTL_VALIDATE_VERSION)
+	@mv $(TOOLS_HOST_DIR)/kubectl-validate $@
+	@$(OK) installed kubectl-validate $(KUBECTL_VALIDATE_VERSION)
+
+# example-lint validates example manifests against CRD schemas using kubectl-validate.
+# Key implementation details:
+#   - Operates on a tmpdir copy so source files are never mutated.
+#   - Replaces uptest template variables (e.g. ${Rand.RFC1123Subdomain}) with a valid
+#     placeholder; kubectl-validate rejects those tokens as malformed field values.
+#   - Filters out non-Vultr YAML files by matching only the apiVersion: line against
+#     vultr.*upbound.io, which covers both the cluster-scoped (vultr.upbound.io)
+#     and namespaced (vultr.m.upbound.io) variants. Anchoring prevents false
+#     positives from description fields or comments that mention other providers.
+#   - Captures absolute paths for the binary and CRDs before cd-ing into tmpdir, and runs
+#     kubectl-validate from there so error output shows short relative paths.
+#   - Iterates one scope/API group directory at a time so failures are reported per group.
+example-lint: $(KUBECTL_VALIDATE)
+	@$(INFO) linting example manifests; \
+	failed=0; \
+	tmpdir=$$(mktemp -d); \
+	crdsdir=$$(pwd)/package/crds; \
+	kv=$$(realpath "$(KUBECTL_VALIDATE)"); \
+	cp -r examples/. "$$tmpdir/"; \
+	find "$$tmpdir" -name "*.yaml" | xargs perl -pi -e 's/\$$\{Rand\.[^}]*\}/uptest/g'; \
+	find "$$tmpdir" -name "*.yaml" | while read f; do grep -q '^apiVersion:.*vultr.*upbound\.io' "$$f" || rm -f "$$f"; done; \
+	for dir in examples/cluster/*/ examples/namespaced/*/; do \
+		group=$${dir#examples/}; group=$${group%/}; \
+		[ -d "$$tmpdir/$$group" ] || continue; \
+		$(INFO) linting $$dir; \
+		(cd "$$tmpdir" && "$$kv" "$$group" --local-crds "$$crdsdir") && $(OK) linted $$dir || { $(WARN) failed to lint $$dir; failed=1; }; \
+	done; \
+	rm -rf "$$tmpdir"; \
+	[ "$$failed" -eq 0 ] && $(OK) linted example manifests || $(FAIL)
+
+.PHONY: cobertura submodules fallthrough run crds.clean crddiff schema-version-diff example-lint local.xpkg.clean
 
 # ====================================================================================
 # Special Targets
@@ -272,6 +341,20 @@ go.lint.analysiskey:
 	@echo $$(make go.lint.analysiskey-interval)$$(sha1sum go.sum | cut -d' ' -f1)
 
 .PHONY: crossplane.help help-special go.mod.cachedir go.lint.analysiskey-interval go.lint.analysiskey
+
+build.init: kustomize-crds
+
+kustomize-crds: output.init $(KUSTOMIZE) $(YQ)
+	@$(INFO) Kustomizing CRDs...
+	@rm -fr $(OUTPUT_DIR)/package || $(FAIL)
+	@cp -R package $(OUTPUT_DIR) && \
+	cd $(OUTPUT_DIR)/package/crds && \
+	$(KUSTOMIZE) create --autodetect || $(FAIL)
+	@export YQ=$(YQ) && \
+	XDG_CONFIG_HOME=$(PWD)/package $(KUSTOMIZE) build --enable-alpha-plugins $(OUTPUT_DIR)/package/kustomize -o $(OUTPUT_DIR)/package/crds.yaml || $(FAIL)
+	@$(OK) Kustomizing CRDs.
+
+.PHONY: kustomize-crds
 
 # TODO(negz): Update CI to use these targets.
 vendor: modules.download

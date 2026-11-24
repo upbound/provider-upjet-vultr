@@ -19,9 +19,6 @@ func (tr *FirewallGroup) Hub() {}
 func (tr *FirewallRule) Hub() {}
 
 // Hub marks this type as a conversion hub.
-func (tr *LoadBalancer) Hub() {}
-
-// Hub marks this type as a conversion hub.
 func (tr *NATGateway) Hub() {}
 
 // Hub marks this type as a conversion hub.

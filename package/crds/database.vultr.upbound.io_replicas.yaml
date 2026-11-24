@@ -567,6 +567,9 @@ spec:
                       type: string
                     type: array
                     x-kubernetes-list-type: set
+                  pendingCharges:
+                    description: Charges due at the end of the billing period.
+                    type: number
                   plan:
                     description: The managed database read replica's plan ID.
                     type: string

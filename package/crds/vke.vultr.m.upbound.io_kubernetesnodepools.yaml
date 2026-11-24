@@ -176,6 +176,14 @@ spec:
                     description: The number of nodes in this node pool.
                     format: int64
                     type: integer
+                  nodeRecycle:
+                    description: A list of node IDs to recycle. This will increase
+                      the node pool size with new nodes and automatically remove the
+                      recycled nodes.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
                   plan:
                     description: The plan to be used in this node pool. See plans
                       list Note the minimum plan requirements must have at least 1
@@ -203,6 +211,11 @@ spec:
                     description: A base64 encoded string containing the user data
                       to apply to nodes in the node pool.
                     type: string
+                  vpcOnly:
+                    description: Enable private-only VPC connectivity for nodes. If
+                      true, nodes can only access the internet via the NAT Gateway
+                      attached to the VPC.
+                    type: boolean
                 type: object
               initProvider:
                 description: |-
@@ -333,6 +346,14 @@ spec:
                     description: The number of nodes in this node pool.
                     format: int64
                     type: integer
+                  nodeRecycle:
+                    description: A list of node IDs to recycle. This will increase
+                      the node pool size with new nodes and automatically remove the
+                      recycled nodes.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
                   plan:
                     description: The plan to be used in this node pool. See plans
                       list Note the minimum plan requirements must have at least 1
@@ -360,6 +381,11 @@ spec:
                     description: A base64 encoded string containing the user data
                       to apply to nodes in the node pool.
                     type: string
+                  vpcOnly:
+                    description: Enable private-only VPC connectivity for nodes. If
+                      true, nodes can only access the internet via the NAT Gateway
+                      attached to the VPC.
+                    type: boolean
                 type: object
               managementPolicies:
                 default:
@@ -485,6 +511,14 @@ spec:
                     description: The number of nodes in this node pool.
                     format: int64
                     type: integer
+                  nodeRecycle:
+                    description: A list of node IDs to recycle. This will increase
+                      the node pool size with new nodes and automatically remove the
+                      recycled nodes.
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: set
                   nodes:
                     items:
                       properties:
@@ -536,6 +570,11 @@ spec:
                     description: A base64 encoded string containing the user data
                       to apply to nodes in the node pool.
                     type: string
+                  vpcOnly:
+                    description: Enable private-only VPC connectivity for nodes. If
+                      true, nodes can only access the internet via the NAT Gateway
+                      attached to the VPC.
+                    type: boolean
                 type: object
               conditions:
                 description: Conditions of the resource.
